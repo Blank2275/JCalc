@@ -11,7 +11,13 @@ public class TokenScanner {
         this.current = 0;
         this.tokens = new ArrayList<Token>();
     }
+    public void setText(String text){
+        this.text = text;
+    }
     public ArrayList<Token> scan(){
+        tokens = new ArrayList<Token>();
+        start = 0;
+        current = 0;
         while(!isAtEnd()){
             start = current;
 

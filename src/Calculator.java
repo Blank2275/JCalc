@@ -10,6 +10,10 @@ public class Calculator {
         for(int i = 0; i < tokens.size(); i++){
             if(tokens.get(i).type == TokenType.LPAREN){
                 int closingIndex = findClosingParen(i, tokens);
+                if(closingIndex == i){// no closing paren was found
+                    error("No closing parentheses was found");
+                    return Double.NaN;
+                }
                 ArrayList<Token> subsection = new ArrayList<>(tokens.subList(i + 1, closingIndex));
                 double result = evaluate(subsection);
                 for(int j = closingIndex - 1; j >= i; j--){
@@ -30,10 +34,18 @@ public class Calculator {
                 }
 
                 double result = Token.performFunc(0, value, tokens.get(i));
+                if(Double.isNaN(result)){
+
+                    //error(String.format("No function or variable named %s found", tokens.get(i).literalName));
+                    return result;
+                }
                 double[] funcDidRun = {0, 0};
 
                 if(tokens.get(i).type == TokenType.LITERAL){
                     funcDidRun = Token.evaluateLiteral(tokens.get(i), 0.0);
+                    if(funcDidRun[1] == 0 && Double.isNaN(funcDidRun[0])){//token is a variable and it is nan
+                        return Double.NaN;
+                    }
                 }
 
                 if(funcDidRun[1] == 1){
@@ -74,7 +86,10 @@ public class Calculator {
             }
             Token token = tokens.get(operatorIndex);
             double result = Token.performFunc(leftHand, rightHand, token);
-
+            if(Double.isNaN(result)){
+                //error(String.format("No function or variable named %s found", token.literalName));
+                return result;
+            }
             tokens.remove(operatorIndex + 1);
             tokens.remove(operatorIndex);
             tokens.remove(operatorIndex - 1);
@@ -84,7 +99,7 @@ public class Calculator {
 //        Token.displayTokens(tokens);
          return tokens.get(0).value;
     }
-    private static void error(String msg){
+    public static void error(String msg){
         System.out.println(String.format("Error in equation: %s", msg));
     }
     private static int findPriorityOperator(int start, ArrayList<Token> tokens){
@@ -127,6 +142,9 @@ public class Calculator {
         int current = i + 1;
         int currentLevel = 1;
         while(currentLevel > 0){
+            if(current >= tokens.size()){
+                return i;
+            }
             if(tokens.get(current).type == TokenType.LPAREN){
                 currentLevel++;
             } else if(tokens.get(current).type == TokenType.RPAREN) {

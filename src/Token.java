@@ -30,7 +30,7 @@ public class Token {
             case LITERAL:
                 return evaluateLiteral(t,b)[0];
             default:
-                return -1.0;
+                return Double.NaN;
         }
     }
 
@@ -42,7 +42,7 @@ public class Token {
                 if(Token.variables.containsKey(t.literalName)){
                     return new double[]{(double)Token.variables.get(t.literalName), 0.0};
                 }
-                return new double[]{Double.NaN, 0};
+                return new double[]{Double.NaN, 0.0};
         }
     }
 

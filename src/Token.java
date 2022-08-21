@@ -40,6 +40,20 @@ public class Token {
                 return new double[]{Math.sqrt(b), 1.0}; //1 means a function was called
             case "sin":
                 return new double[]{Math.sin(b), 1.0};
+            case "cos":
+                return new double[]{Math.cos(b), 1.0};
+            case "tan":
+                return new double[]{Math.tan(b), 1.0};
+            case "asin":
+                return new double[]{Math.asin(b), 1.0};
+            case "acos":
+                return new double[]{Math.acos(b), 1.0};
+            case "atan":
+                return new double[]{Math.atan(b), 1.0};
+            case "factorial":
+                return new double[]{factorial(b), 1.0};
+            case "floor":
+                return new double[]{Math.floor(b), 1.0};
             default:
                 if(Token.variables.containsKey(t.literalName)){
                     return new double[]{(double)Token.variables.get(t.literalName), 0.0};
@@ -49,6 +63,12 @@ public class Token {
 
     }
 
+    private static double factorial(double x){
+        int rounded = (int)x;
+        if(rounded < 1) return Double.NaN;
+        else if(rounded == 1) return 1;
+        else return rounded * factorial((float)(rounded - 1));
+    }
 
     public static void display(Token t){
         String msg = generateDisplayString(t);

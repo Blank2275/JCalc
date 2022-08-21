@@ -1,4 +1,7 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+
+import static java.lang.Math.round;
 
 public class Calculator {
     ArrayList<Token> tokens;
@@ -97,7 +100,10 @@ public class Calculator {
         }
 
 //        Token.displayTokens(tokens);
-         return tokens.get(0).value;
+        double result = tokens.get(0).value;
+        DecimalFormat df = new DecimalFormat("####0.00000");
+        double rounded = Double.parseDouble(df.format(result));
+        return rounded;
     }
     public static void error(String msg){
         System.out.println(String.format("Error in equation: %s", msg));

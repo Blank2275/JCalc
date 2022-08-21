@@ -38,12 +38,15 @@ public class Token {
         switch(t.literalName){
             case "sqrt":
                 return new double[]{Math.sqrt(b), 1.0}; //1 means a function was called
+            case "sin":
+                return new double[]{Math.sin(b), 1.0};
             default:
                 if(Token.variables.containsKey(t.literalName)){
                     return new double[]{(double)Token.variables.get(t.literalName), 0.0};
                 }
                 return new double[]{Double.NaN, 0.0};
         }
+
     }
 
 

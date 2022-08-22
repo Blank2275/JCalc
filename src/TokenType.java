@@ -8,5 +8,6 @@ public enum TokenType {
     POW,
     LPAREN,
     RPAREN,
+    COMMA,
     LITERAL//
 }

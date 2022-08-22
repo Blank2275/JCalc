@@ -17,32 +17,59 @@ public class Calculator {
     public static double evaluate(ArrayList<Token> tokens){
         //take care of parentheses recursively
         for(int i = 0; i < tokens.size(); i++){
-            if(tokens.get(i).type == TokenType.LPAREN){
+            if(tokens.get(i).type == TokenType.LPAREN) {
                 int closingIndex = findClosingParen(i, tokens);
-                if(closingIndex == i){// no closing paren was found
+                if (closingIndex == i) {// no closing paren was found
                     error("No closing parentheses was found");
                     return Double.NaN;
                 }
                 ArrayList<Token> subsection = new ArrayList<>(tokens.subList(i + 1, closingIndex));
-                double result = evaluate(subsection);
-                for(int j = closingIndex - 1; j >= i; j--){
-                    tokens.remove(j);
+                if (tokens.get(i - 1).type != TokenType.LITERAL) {
+                    double result = evaluate(subsection);
+                    for (int j = closingIndex - 2; j >= i; j--) {
+                        tokens.remove(j);
+                    }
+                    tokens.add(i, new Token(result, null, TokenType.NUMBER));
+                } else {
+                    ArrayList<ArrayList<Token>> arguments = parseArguments(subsection);
+                    for (int j = closingIndex - 2; j >= i; j--) {
+                        tokens.remove(j);
+                    }
+                    int count = 0;
+                    for(ArrayList<Token> argument: arguments){
+                        double result = evaluate(argument);
+                        tokens.add(i + count * 2, new Token(result, null, TokenType.NUMBER));
+                        if(count < arguments.size() - 1){
+                            tokens.add(i + 1 + count * 2, new Token(0, null, TokenType.COMMA));
+                        }
+
+                        count++;
+                    }
                 }
-                tokens.add(i, new Token(result, null, TokenType.NUMBER));
             }
         }
+
         int i = 0;//evaluate all functions ex: sqrt, sin
         while(i < tokens.size()){
             if(tokens.get(i).type == TokenType.LITERAL){
-                double value = Double.NaN;
-                if(i + 1 < tokens.size()){
-                    if(tokens.get(i + 1).type == TokenType.NUMBER){
-                        value = tokens.get(i + 1).value;
+                ArrayList<Double> arguments = new ArrayList<Double>();
+                int j = i + 1;
+                while(j < tokens.size()){
+                    if(tokens.get(j).type == TokenType.RPAREN){
+                        break;
                     }
-
+                    if(tokens.get(j).type == TokenType.NUMBER){
+                        if(tokens.get(j - 1).type != TokenType.COMMA && tokens.get(j - 1).type != TokenType.LITERAL){
+                            error("You must seperate arguments by comma");
+                            return Double.NaN;
+                        } else {
+                            arguments.add(tokens.get(j).value);
+                        }
+                    }
+                    j++;
                 }
 
-                double result = Token.performFunc(0, value, tokens.get(i));
+                double result = Token.performFunc(arguments, tokens.get(i));
                 if(Double.isNaN(result)){
 
                     //error(String.format("No function or variable named %s found", tokens.get(i).literalName));
@@ -51,14 +78,19 @@ public class Calculator {
                 double[] funcDidRun = {0, 0};
 
                 if(tokens.get(i).type == TokenType.LITERAL){
-                    funcDidRun = Token.evaluateLiteral(tokens.get(i), 0.0);
+                    ArrayList<Double> temp = new ArrayList<Double>();
+                    temp.add(0.0);
+                    funcDidRun = Token.evaluateLiteral(tokens.get(i), arguments);
                     if(funcDidRun[1] == 0 && Double.isNaN(funcDidRun[0])){//token is a variable and it is nan
                         return Double.NaN;
                     }
                 }
 
                 if(funcDidRun[1] == 1){
-                    tokens.remove(i + 1); // only if a function ran should we delete the next token
+                    // only if a function ran should we delete the next token
+                    for(int k = i + (arguments.size() * 2); k >= i + 1; k--){//delete two extra tokens for every argument, the number and the comma
+                        tokens.remove(k);
+                    }
                 }
                 tokens.remove(i);
                 tokens.add(i, new Token(result, null, TokenType.NUMBER));
@@ -94,7 +126,10 @@ public class Calculator {
                 return Double.NaN;
             }
             Token token = tokens.get(operatorIndex);
-            double result = Token.performFunc(leftHand, rightHand, token);
+            ArrayList<Double> arguments = new ArrayList<Double>();
+            arguments.add(leftHand);
+            arguments.add(rightHand);
+            double result = Token.performFunc(arguments, token);
             if(Double.isNaN(result)){
                 //error(String.format("No function or variable named %s found", token.literalName));
                 return result;
@@ -105,11 +140,24 @@ public class Calculator {
             tokens.add(operatorIndex - 1, new Token(result, null, TokenType.NUMBER));
         }
 
-//        Token.displayTokens(tokens);
         double result = tokens.get(0).value;
         DecimalFormat df = new DecimalFormat("####0.00000");
         double rounded = Double.parseDouble(df.format(result));
         return rounded;
+    }
+    private static ArrayList<ArrayList<Token>> parseArguments(ArrayList<Token> tokens){
+        ArrayList<ArrayList<Token>> result = new ArrayList<ArrayList<Token>>();
+        int start = 0;
+        int current = 0;
+
+        for(Token token: tokens){
+            if(token.type == TokenType.COMMA || token.type == TokenType.RPAREN){
+                result.add(new ArrayList<Token>(tokens.subList(start, current)));
+                start = current + 1;
+            }
+            current++;
+        }
+        return result;
     }
     public static void error(String msg){
         System.out.println(String.format("Error in equation: %s", msg));

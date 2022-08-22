@@ -13,47 +13,49 @@ public class Token {
         Token.variables.put("PI", 3.14159);
     }
 
-    static double performFunc(double a, double b, Token t){
+    static double performFunc(ArrayList<Double> args, Token t){
         switch (t.type){
             case PLUS:
-                return a + b;
+                return args.get(0) + args.get(1);
             case MINUS:
-                return  a - b;
+                return  args.get(0) - args.get(1);
             case MUL:
-                return a * b;
+                return args.get(0) * args.get(1);
             case DIV:
-                return a / b;
+                return args.get(0) / args.get(1);
             case MOD:
-                return a % b;
+                return args.get(0) % args.get(1);
             case POW:
-                return Math.pow(a, b);
+                return Math.pow(args.get(0), args.get(1));
             case LITERAL:
-                return evaluateLiteral(t,b)[0];
+                return evaluateLiteral(t, args)[0];
             default:
                 return Double.NaN;
         }
     }
 
-    public static double[] evaluateLiteral(Token t,  double b){
+    public static double[] evaluateLiteral(Token t,  ArrayList<Double> args){
         switch(t.literalName){
             case "sqrt":
-                return new double[]{Math.sqrt(b), 1.0}; //1 means a function was called
+                return new double[]{Math.sqrt(args.get(0)), 1.0}; //1 means a function was called
             case "sin":
-                return new double[]{Math.sin(b), 1.0};
+                return new double[]{Math.sin(args.get(0)), 1.0};
             case "cos":
-                return new double[]{Math.cos(b), 1.0};
+                return new double[]{Math.cos(args.get(0)), 1.0};
             case "tan":
-                return new double[]{Math.tan(b), 1.0};
+                return new double[]{Math.tan(args.get(0)), 1.0};
             case "asin":
-                return new double[]{Math.asin(b), 1.0};
+                return new double[]{Math.asin(args.get(0)), 1.0};
             case "acos":
-                return new double[]{Math.acos(b), 1.0};
+                return new double[]{Math.acos(args.get(0)), 1.0};
             case "atan":
-                return new double[]{Math.atan(b), 1.0};
+                return new double[]{Math.atan(args.get(0)), 1.0};
             case "factorial":
-                return new double[]{factorial(b), 1.0};
+                return new double[]{factorial(args.get(0)), 1.0};
             case "floor":
-                return new double[]{Math.floor(b), 1.0};
+                return new double[]{Math.floor(args.get(0)), 1.0};
+            case "dist":
+                return new double[]{dist(args.get(0), args.get(1), args.get(2), args.get(3)), 1.0};
             default:
                 if(Token.variables.containsKey(t.literalName)){
                     return new double[]{(double)Token.variables.get(t.literalName), 0.0};
@@ -61,6 +63,10 @@ public class Token {
                 return new double[]{Double.NaN, 0.0};
         }
 
+    }
+
+    private static double dist(double x1,double y1,double x2,double y2){
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
     private static double factorial(double x){
@@ -100,6 +106,9 @@ public class Token {
                 break;
             case POW:
                 msg = "Symbol: ^";
+                break;
+            case COMMA:
+                msg = "Symbol: ,";
                 break;
             case LITERAL:
                 msg = String.format("Literal: %s", t.literalName);

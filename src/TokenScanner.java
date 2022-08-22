@@ -61,6 +61,8 @@ public class TokenScanner {
             case ')':
                 tokens.add(new Token(0, null, TokenType.RPAREN));
                 break;
+            case ',':
+                tokens.add(new Token(0, null, TokenType.COMMA));
             default:
                 if(isDigit(c)){
                     number();

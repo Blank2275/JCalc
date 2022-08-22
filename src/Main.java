@@ -20,7 +20,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args){
-        TokenScanner scanner = new TokenScanner("");//
         Scanner inputScanner = new Scanner(System.in);
 
         boolean running = true;
@@ -33,11 +32,7 @@ public class Main {
                 continue;
             }
 
-            scanner.setText(input);
-
-            ArrayList<Token> tokens = scanner.scan();
-
-            System.out.println(Calculator.evaluate(tokens));
+            System.out.println(Calculator.calculate(input));
         }
     }
 }

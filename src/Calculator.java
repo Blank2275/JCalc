@@ -5,8 +5,15 @@ import static java.lang.Math.round;
 
 public class Calculator {
     ArrayList<Token> tokens;
+    static final TokenScanner scanner = new TokenScanner("");
     public Calculator(ArrayList<Token> tokens){
         this.tokens = tokens;
+    }
+    public static double calculate(String text){
+        scanner.setText(text);
+        ArrayList<Token> tokens = scanner.scan();
+
+        return evaluate(tokens);
     }
     public static double evaluate(ArrayList<Token> tokens){
         //take care of parentheses recursively

@@ -12,7 +12,6 @@ public class Calculator {
     public static double calculate(String text){
         scanner.setText(text);
         ArrayList<Token> tokens = scanner.scan();
-
         return evaluate(tokens);
     }
     public static double evaluate(ArrayList<Token> tokens){

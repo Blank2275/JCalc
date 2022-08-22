@@ -36,8 +36,13 @@ public class TokenScanner {
                 tokens.add(new Token(0, null, TokenType.PLUS));
                 break;
             case '-':
-                tokens.add(new Token(0, null, TokenType.MINUS));
-                break;
+                if (!isDigit(peek())) {
+                    tokens.add(new Token(0, null, TokenType.MINUS));
+                    break;
+                } else {
+                    number();
+                    break;
+                }
             case '*':
                 tokens.add(new Token(0, null, TokenType.MUL));
                 break;
@@ -66,7 +71,7 @@ public class TokenScanner {
         }
     }
     boolean isDigit(char c){
-        return (c >= '0' && c <= '9');
+        return (c >= '0' && c <= '9' || c == '-');
     }
     boolean isAlpha(char c){
         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
